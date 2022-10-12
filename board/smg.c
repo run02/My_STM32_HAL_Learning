@@ -3,7 +3,7 @@
 //
 #include "main.h"
 #include "myAPI.h"
-#define TUBE_OFF 21
+#define TUBE_OFF 37
 #define SEL0 GPIO_PIN_0
 #define SEL1 GPIO_PIN_1
 #define SEL2 GPIO_PIN_2
@@ -12,53 +12,100 @@
 #define L7 GPIO_PIN_15
 
 short int code_table[]={
-0xc0,//0
-0xf9,//1
-0xa4,//2
-0xb0,//3
-0x99,//4
-0x92,//5
-0x82,//6
-0xf8,//7
-0x80,//8
-0x90,//9
-0x88,//A
-0x83,//B
-0xc6,//C
-0xa1,//D
-0x86,//E
-0x8e, //F
-0x8c, //P
-0xc1,//U
-0x91,//Y
-0x7c,//L
-0x00,//全亮
-0xff  //熄灭
+        0x3F,  //"0"
+        0x06,  //"1"
+        0x5B,  //"2"
+        0x4F,  //"3"
+        0x66,  //"4"
+        0x6D,  //"5"
+        0x7D,  //"6"
+        0x07,  //"7"
+        0x7F,  //"8"
+        0x6F,  //"9"
+        0x77,
+        0x7c,
+        0x39,
+        0x5e,
+        0x79,
+        0x71,
+        0x3d,
+        0x76,
+        0x0f,
+        0x0e,
+        0x75,
+        0x38,
+        0x37,
+        0x54,
+        0x5c,
+        0x73,
+        0x67,
+        0x31,
+        0x49,
+        0x78,
+        0x3e,
+        0x1c,
+        0x7e,
+        0x64,
+        0x6e,
+        0x59,
+        0x40,  //"-"
+        0x00  //熄灭
 };
+void smg_init(){
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                             |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
+
+    /*Configure GPIO pins : PE8 PE9 PE10 PE11
+                             PE12 PE13 PE14 PE15 */
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : PB0-3 */
+    GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
 
 void lock(){
-    HAL_GPIO_WritePin(GPIOB,GPIO_PIN_3,GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB,LED_SEL,0);
 }
 void unlock(){
-    HAL_GPIO_WritePin(GPIOB,GPIO_PIN_3,GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB,LED_SEL,1);
 }
 void light_group_writePin(uint16_t L, GPIO_PinState PinState){
     HAL_GPIO_WritePin(GPIOE,L,PinState);
 }
 
 void digital_tube_display(int pos,int num){
-
-    uint8_t sel0=(pos>>2)&0x01;
-    uint8_t sel1=(pos>>1)&0x01;
-    uint8_t sel2=pos&0x01;
     int i=0;
     unlock();
-    HAL_GPIO_WritePin(GPIOB,SEL0,sel0);
-    HAL_GPIO_WritePin(GPIOB,SEL1,sel1);
-    HAL_GPIO_WritePin(GPIOB,SEL2,sel2);
+    HAL_GPIO_WritePin(GPIOB,SEL0,pos&0x01);
+    HAL_GPIO_WritePin(GPIOB,SEL1,(pos>>1)&0x01);
+    HAL_GPIO_WritePin(GPIOB,SEL2,(pos>>2)&0x01);
     for(i=0;i<8;i++)
-        light_group_writePin(L0<<i,code_table[num]>>i);
-
-
+        light_group_writePin(L0<<i,(code_table[num]>>i&0x01));
     lock();
+}
+
+void digital_tube_display_char(int pos,int c){
+    if(c>='0'&&c<='9')
+        digital_tube_display(pos,c-'0');
+    else if(c>='A'&& c<='L')
+        digital_tube_display(pos,c-'A'+10);
+    else
+        digital_tube_display(pos,TUBE_OFF);
 }
