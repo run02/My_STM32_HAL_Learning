@@ -1,17 +1,19 @@
 //
 // Created by Ryan on 2022/10/12.
 //
+#include "string.h"
 #include "main.h"
 #include "myAPI.h"
+
 #define TUBE_OFF 37
 #define SEL0 GPIO_PIN_0
 #define SEL1 GPIO_PIN_1
 #define SEL2 GPIO_PIN_2
 #define LED_SEL GPIO_PIN_3
 #define L0 GPIO_PIN_8
-#define L7 GPIO_PIN_15
+//#define L7 GPIO_PIN_15
 
-short int code_table[]={
+const short int code_table[]={
         0x3F,  //"0"
         0x06,  //"1"
         0x5B,  //"2"
@@ -49,7 +51,8 @@ short int code_table[]={
         0x6e,
         0x59,
         0x40,  //"-"
-        0x00  //熄灭
+        0x00,  //熄灭,
+        0xbf,0x86,0xdb,0xcf,0xe6,0xed,0xfd,0x87,0xff,0xef,0xf7,0xfc,0xb9,0xde,0xf9,0xf1
 };
 void smg_init(){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -101,11 +104,32 @@ void digital_tube_display(int pos,int num){
     lock();
 }
 
-void digital_tube_display_char(int pos,int c){
-    if(c>='0'&&c<='9')
-        digital_tube_display(pos,c-'0');
-    else if(c>='A'&& c<='L')
-        digital_tube_display(pos,c-'A'+10);
-    else
-        digital_tube_display(pos,TUBE_OFF);
+void digital_tube_display_char(int pos,char *c){
+    if(strlen(c)>1){
+        if (*c >= '0' && *c <= '9' && *(c+1)=='.')
+            digital_tube_display(pos, *c - '0'+TUBE_OFF+1);
+    }else {
+        if (*c >= '0' && *c <= '9')
+            digital_tube_display(pos, *c - '0');
+        else if (*c >= 'A' && *c <= 'L')
+            digital_tube_display(pos, *c - 'A' + 10);
+        else
+            digital_tube_display(pos, TUBE_OFF);
+    }
+}
+
+void digital_tube_display_string(int pos,char *s){
+    char temp[2];
+    while (*s&&pos!=8){
+        temp[0]=*s;
+        if((*(s+1)=='.')){
+            temp[1]='.';
+            digital_tube_display_char(pos++,temp);
+            s+=2;
+        }else{
+            temp[1]='\0';
+            digital_tube_display_char(pos++,temp);
+            s++;
+        }
+    }
 }
