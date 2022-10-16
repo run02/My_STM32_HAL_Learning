@@ -93,60 +93,19 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
+//  MX_GPIO_Init();
+smg_init();
+led_init();
   /* USER CODE BEGIN 2 */
-    HAL_GPIO_WritePin(GPIOB,GPIO_PIN_3,GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      //led_display();
-//      static int i=0;
-//      i=++i>=8?0:i;
-//      digital_tube_display(i,i);
-      digital_tube_display_char(0,'H');
-      digital_tube_display_char(1,'E');
-      digital_tube_display_char(2,'L');
-      digital_tube_display_char(3,'L');
-      digital_tube_display_char(4,'0');
-//      digital_tube_display_char(5,'1');
-//      digital_tube_display_char(5,'0');
-//      digital_tube_display(0,0);
-//      digital_tube_display(1,0);
-//      digital_tube_display(2,0);
-//      digital_tube_display(3,0);
-//      digital_tube_display(0,0);
-//      HAL_Delay(1000);
-      //HAL_Delay(1000);
-//      unsigned short int x=0b0;
-//      unsigned int max=GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
-//      unsigned int half=GPIO_PIN_8|GPIO_PIN_10|GPIO_PIN_12|GPIO_PIN_14;
-//      static int cnt=0;
-//      if(cnt==0) {
-//          static short int i = 0;
-//          HAL_GPIO_WritePin(GPIOE, max, GPIO_PIN_RESET);
-//          HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8 << i, GPIO_PIN_SET);
-//          HAL_Delay(1000);
-//          cnt = ((i++)> 7) ? 1 : 0;
-//          i=cnt!=0?0:i;
-//      }else if(cnt==1){
-//          static short int i = 0;
-//          HAL_GPIO_WritePin(GPIOE, max, GPIO_PIN_RESET);
-//          HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15 >> i, GPIO_PIN_SET);
-//          HAL_Delay(1000);
-//          cnt = ((i++) > 7) ? 2 : 1;
-//          i=cnt!=1?0:i;
-//      }else if(cnt==2){
-//          static short int i = 0;
-//          x=(i%2==0)?half:(half<<1);
-//          HAL_GPIO_WritePin(GPIOE, max, GPIO_PIN_RESET);
-//          HAL_GPIO_WritePin(GPIOE, x, GPIO_PIN_SET);
-//          HAL_Delay(1000);
-//          cnt = ((i++) > 5) ? 0 : 2;
-//          i=cnt!=2?0:i;
-//      }
+
+//    test_smg_in_while1();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -203,8 +162,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
                           |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -212,7 +172,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PE8 PE9 PE10 PE11
                            PE12 PE13 PE14 PE15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
                           |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -225,6 +185,9 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+
+
 }
 
 /* USER CODE BEGIN 4 */

@@ -133,3 +133,7 @@ void digital_tube_display_string(int pos,char *s){
         }
     }
 }
+
+void test_smg_in_while1(void){
+    digital_tube_display_string(0,"HELL0");
+}
