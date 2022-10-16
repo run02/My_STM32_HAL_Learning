@@ -54,7 +54,7 @@ include_directories(Core/Inc Drivers/STM32F1xx_HAL_Driver/Inc Drivers/STM32F1xx_
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB)
 
-file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "board/*.*")
+file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "board/*.*" )
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103VBTX_FLASH.ld)
 
