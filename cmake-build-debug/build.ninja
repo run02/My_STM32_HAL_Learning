@@ -209,6 +209,22 @@ build CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1x
   OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir
   OBJECT_FILE_DIR = CMakeFiles\learning_vbt6.elf.dir\Drivers\STM32F1xx_HAL_Driver\Src
 
+build CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj: C_COMPILER__learning_vbt6.2eelf_Debug C$:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c || cmake_object_order_depends_target_learning_vbt6.elf
+  DEFINES = -DDEBUG -DSTM32F103xB -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\learning_vbt6.elf.dir\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c.obj.d
+  FLAGS = -g -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Og -g
+  INCLUDES = -IC:/Users/Ryan/Desktop/learning_vbt6/Core/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Include -IC:/Users/Ryan/Desktop/learning_vbt6/board/Inc
+  OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir
+  OBJECT_FILE_DIR = CMakeFiles\learning_vbt6.elf.dir\Drivers\STM32F1xx_HAL_Driver\Src
+
+build CMakeFiles/learning_vbt6.elf.dir/board/buzz_music.c.obj: C_COMPILER__learning_vbt6.2eelf_Debug C$:/Users/Ryan/Desktop/learning_vbt6/board/buzz_music.c || cmake_object_order_depends_target_learning_vbt6.elf
+  DEFINES = -DDEBUG -DSTM32F103xB -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\learning_vbt6.elf.dir\board\buzz_music.c.obj.d
+  FLAGS = -g -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Og -g
+  INCLUDES = -IC:/Users/Ryan/Desktop/learning_vbt6/Core/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Include -IC:/Users/Ryan/Desktop/learning_vbt6/board/Inc
+  OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir
+  OBJECT_FILE_DIR = CMakeFiles\learning_vbt6.elf.dir\board
+
 build CMakeFiles/learning_vbt6.elf.dir/board/led.c.obj: C_COMPILER__learning_vbt6.2eelf_Debug C$:/Users/Ryan/Desktop/learning_vbt6/board/led.c || cmake_object_order_depends_target_learning_vbt6.elf
   DEFINES = -DDEBUG -DSTM32F103xB -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\learning_vbt6.elf.dir\board\led.c.obj.d
@@ -225,6 +241,14 @@ build CMakeFiles/learning_vbt6.elf.dir/board/smg.c.obj: C_COMPILER__learning_vbt
   OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir
   OBJECT_FILE_DIR = CMakeFiles\learning_vbt6.elf.dir\board
 
+build CMakeFiles/learning_vbt6.elf.dir/board/sth.c.obj: C_COMPILER__learning_vbt6.2eelf_Debug C$:/Users/Ryan/Desktop/learning_vbt6/board/sth.c || cmake_object_order_depends_target_learning_vbt6.elf
+  DEFINES = -DDEBUG -DSTM32F103xB -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\learning_vbt6.elf.dir\board\sth.c.obj.d
+  FLAGS = -g -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Og -g
+  INCLUDES = -IC:/Users/Ryan/Desktop/learning_vbt6/Core/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Ryan/Desktop/learning_vbt6/Drivers/CMSIS/Include -IC:/Users/Ryan/Desktop/learning_vbt6/board/Inc
+  OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir
+  OBJECT_FILE_DIR = CMakeFiles\learning_vbt6.elf.dir\board
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target learning_vbt6.elf
@@ -233,7 +257,7 @@ build CMakeFiles/learning_vbt6.elf.dir/board/smg.c.obj: C_COMPILER__learning_vbt
 #############################################
 # Link the executable learning_vbt6.elf
 
-build learning_vbt6.elf: C_EXECUTABLE_LINKER__learning_vbt6.2eelf_Debug CMakeFiles/learning_vbt6.elf.dir/Core/Src/main.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/stm32f1xx_hal_msp.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/stm32f1xx_it.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/syscalls.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/sysmem.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/system_stm32f1xx.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Startup/startup_stm32f103vbtx.s.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/board/led.c.obj CMakeFiles/learning_vbt6.elf.dir/board/smg.c.obj
+build learning_vbt6.elf: C_EXECUTABLE_LINKER__learning_vbt6.2eelf_Debug CMakeFiles/learning_vbt6.elf.dir/Core/Src/main.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/stm32f1xx_hal_msp.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/stm32f1xx_it.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/syscalls.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/sysmem.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Src/system_stm32f1xx.c.obj CMakeFiles/learning_vbt6.elf.dir/Core/Startup/startup_stm32f103vbtx.s.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj CMakeFiles/learning_vbt6.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj CMakeFiles/learning_vbt6.elf.dir/board/buzz_music.c.obj CMakeFiles/learning_vbt6.elf.dir/board/led.c.obj CMakeFiles/learning_vbt6.elf.dir/board/smg.c.obj CMakeFiles/learning_vbt6.elf.dir/board/sth.c.obj
   FLAGS = -g
   LINK_FLAGS = -Wl,-gc-sections,--print-memory-usage,-Map=C:/Users/Ryan/Desktop/learning_vbt6/cmake-build-debug/learning_vbt6.map -mcpu=cortex-m3 -mthumb -mthumb-interwork -T C:/Users/Ryan/Desktop/learning_vbt6/STM32F103VBTX_FLASH.ld
   OBJECT_DIR = CMakeFiles\learning_vbt6.elf.dir

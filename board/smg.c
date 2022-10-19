@@ -1,17 +1,25 @@
 //
 // Created by Ryan on 2022/10/12.
 //
-#include "string.h"
 #include "main.h"
 #include "myAPI.h"
 
-#define TUBE_OFF 37
-#define SEL0 GPIO_PIN_0
-#define SEL1 GPIO_PIN_1
-#define SEL2 GPIO_PIN_2
-#define LED_SEL GPIO_PIN_3
-#define L0 GPIO_PIN_8
-//#define L7 GPIO_PIN_15
+#define TUBE_OFF 37 //数码段表熄灭的下标
+#define SEL0 GPIO_PIN_0 //译码器A0
+#define SEL1 GPIO_PIN_1 //译码器A1
+#define SEL2 GPIO_PIN_2 //译码器A2
+#define LED_SEL GPIO_PIN_3 //LED灯开关
+#define L0 GPIO_PIN_8  //LED0 (数码段的A)
+#define L1 GPIO_PIN_9
+#define L2 GPIO_PIN_10
+#define L3 GPIO_PIN_11
+#define L4 GPIO_PIN_12
+#define L5 GPIO_PIN_13
+#define L6 GPIO_PIN_14
+#define L7 GPIO_PIN_15
+#define LOCK_GROUP GPIOB //LED灯开关的引脚的组
+#define LIGHT_GROUP GPIOE //LED灯的引脚的组
+#define ALL_LED L0|L1|L2|L3|L4|L5|L6|L7
 
 const short int code_table[]={
         0x3F,  //"0"
@@ -24,34 +32,34 @@ const short int code_table[]={
         0x07,  //"7"
         0x7F,  //"8"
         0x6F,  //"9"
-        0x77,
-        0x7c,
-        0x39,
-        0x5e,
-        0x79,
-        0x71,
-        0x3d,
-        0x76,
-        0x0f,
-        0x0e,
-        0x75,
-        0x38,
-        0x37,
-        0x54,
-        0x5c,
-        0x73,
-        0x67,
-        0x31,
-        0x49,
-        0x78,
-        0x3e,
-        0x1c,
-        0x7e,
-        0x64,
-        0x6e,
-        0x59,
+        0x77,//a
+        0x7c,//b
+        0x39,//c
+        0x5e,//d
+        0x79,//e
+        0x71,//f
+        0x3d,//g
+        0x76,//h
+        0x0f,//i
+        0x0e,//j
+        0x75,//k
+        0x38,//l
+        0x37,//m
+        0x54,//n
+        0x5c,//o
+        0x73,//p
+        0x67,//q
+        0x31,//r
+        0x49,//s
+        0x78,//t
+        0x3e,//u
+        0x1c,//v
+        0x7e,//w
+        0x64,//x
+        0x6e,//y
+        0x59,//z
         0x40,  //"-"
-        0x00,  //熄灭,
+        0x00,  //熄灭,下边是带小数点的0-9
         0xbf,0x86,0xdb,0xcf,0xe6,0xed,0xfd,0x87,0xff,0xef,0xf7,0xfc,0xb9,0xde,0xf9,0xf1
 };
 void smg_init(){
@@ -83,40 +91,65 @@ void smg_init(){
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
-void lock(){
-    HAL_GPIO_WritePin(GPIOB,LED_SEL,0);
+static void lock(){
+    HAL_GPIO_WritePin(LOCK_GROUP,LED_SEL,0);
 }
-void unlock(){
-    HAL_GPIO_WritePin(GPIOB,LED_SEL,1);
+static void unlock(){
+    HAL_GPIO_WritePin(LOCK_GROUP,LED_SEL,1);
 }
 void light_group_writePin(uint16_t L, GPIO_PinState PinState){
-    HAL_GPIO_WritePin(GPIOE,L,PinState);
+    HAL_GPIO_WritePin(LIGHT_GROUP,L,PinState);
 }
 
 void digital_tube_display(int pos,int num){
     int i=0;
+    uint32_t L=L0;
+    uint32_t P=code_table[num];
     unlock();
     HAL_GPIO_WritePin(GPIOB,SEL0,pos&0x01);
     HAL_GPIO_WritePin(GPIOB,SEL1,(pos>>1)&0x01);
     HAL_GPIO_WritePin(GPIOB,SEL2,(pos>>2)&0x01);
-    for(i=0;i<8;i++)
-        light_group_writePin(L0<<i,(code_table[num]>>i&0x01));
+    light_group_writePin(ALL_LED,0);
+    while (L>>=1)
+        P<<=1;
+    light_group_writePin(ALL_LED,0);
+    light_group_writePin(P,1);
+//    for(i=0;i<8;i++)
+//        light_group_writePin(L0<<i,(code_table[num]>>i&0x01));
     lock();
 }
 
 void digital_tube_display_char(int pos,char *c){
-    if(strlen(c)>1){
         if (*c >= '0' && *c <= '9' && *(c+1)=='.')
             digital_tube_display(pos, *c - '0'+TUBE_OFF+1);
-    }else {
-        if (*c >= '0' && *c <= '9')
+        else if (*c >= '0' && *c <= '9')
             digital_tube_display(pos, *c - '0');
-        else if (*c >= 'A' && *c <= 'L')
+        else if (*c >= 'A' && *c <= 'Z')
             digital_tube_display(pos, *c - 'A' + 10);
+        else if (*c >= 'a' && *c <= 'z')
+            digital_tube_display(pos, *c - 'a' + 10);
         else
             digital_tube_display(pos, TUBE_OFF);
-    }
 }
+//
+//void digital_tube_display_string_IT(void){
+//    extern char Tube_String8[16];
+//    static int pos=0;
+//    char *s=;
+//    char temp[2];
+//    temp[0]=*(Tube_String8+pos);
+//    if((*(s+1)=='.')){
+//        temp[1]='.';
+//        digital_tube_display_char(pos++,temp);
+//        s+=2;
+//    }else{
+//        temp[1]='\0';
+//        digital_tube_display_char(pos++,temp);
+//        s++;
+//    }
+//    if(!s)
+//        s=Tube_String8;
+//}
 
 void digital_tube_display_string(int pos,char *s){
     char temp[2];
@@ -135,5 +168,5 @@ void digital_tube_display_string(int pos,char *s){
 }
 
 void test_smg_in_while1(void){
-    digital_tube_display_string(0,"HELL0");
+    digital_tube_display_string(0,"Hell012.3");
 }

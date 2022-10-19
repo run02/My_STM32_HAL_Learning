@@ -10,7 +10,15 @@
 #define uc16 unsigned int
 #define PBeep(x) HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,(x))
 
-#define CPU_FREQUENCY_MHZ    9	// STM32时钟主频
+#define CPU_FREQUENCY_MHZ    8	// STM32时钟主频
+void set_up(void){
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+}
 
 void delay_us(__IO uint32_t delay)
 {
@@ -87,6 +95,7 @@ void play(void)
     u32 yanshi;
     u16 i,e;
     yanshi = 6;//10;  4;  2
+    set_up();
     for(i=0;i<46;i++){
         for(e=0;e<((u16)time[i])*tone[music[i]]/yanshi;e++){
             Sound((u32)tone[music[i]]);
