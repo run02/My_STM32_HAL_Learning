@@ -1,7 +1,8 @@
 ### C++ template
 # Prerequisites
 *.d
-
+*.ld
+cmake-build-debug
 # Compiled Object files
 *.slo
 *.lo

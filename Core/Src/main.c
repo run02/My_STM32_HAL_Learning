@@ -29,7 +29,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+char Tube_String8[8][2]={"h",
+                         "e",
+                         "l",
+                         "l",
+                         "o",
+                         " ",
+                         " ",
+                         " "
+};
+extern int cnt_press;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -91,10 +100,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   * @brief  The application entry point.
   * @retval int
   */
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-strcpy(Tube_String8,"123456\0");
+//strcpy(Tube_String8,"123456\0");
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -301,10 +312,10 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 4, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 3, 0);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
 }
@@ -314,31 +325,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim3))
     {
-        static int i=0;
-        i++;
-        if(i%2==0) {
-            int x=get_cnt();
-            digital_tube_display(0,x/100%10);
-        }
-        if(i%3==0) {
-            int x=get_cnt();
 
-            digital_tube_display(1,x/10%10);
-
-        }
-        if(i%5==0) {
-            int x=get_cnt();
-            digital_tube_display(2,x % 10);
-        }
-        if(i>=100000)
-            i=0;
-//        char s[3];
-//        itoa(i,s,3);
-//        Tube_String8[0]=s[0];
-//        Tube_String8[1]=s[1];
-//        Tube_String8[2]=s[2];
-//        digital_tube_display_string_IT();
-//        digital_tube_display_string(0,Tube_String8);
+        Tube_String8[0][0]=cnt_press/100%10+'0';
+        Tube_String8[0][1]=0;
+        Tube_String8[1][0]=cnt_press/10%10+'0';
+        Tube_String8[0][1]=0;
+        Tube_String8[2][0]=cnt_press%10+'0';
+        Tube_String8[0][1]=0;
+        digital_tube_display_string_IT();
     }
 }
 /* USER CODE END 4 */

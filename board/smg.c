@@ -102,20 +102,22 @@ void light_group_writePin(uint16_t L, GPIO_PinState PinState){
 }
 
 void digital_tube_display(int pos,int num){
-    int i=0;
-    uint32_t L=L0;
-    uint32_t P=code_table[num];
+//    uint32_t L=L0;
+//    uint32_t P=code_table[num];
+//    HAL_GPIO_WritePin(LOCK_GROUP,SEL0,pos&0x01);
+//    HAL_GPIO_WritePin(LOCK_GROUP,SEL1,(pos>>1)&0x01);
+//    HAL_GPIO_WritePin(LOCK_GROUP,SEL2,(pos>>2)&0x01);
+//    unlock();
+//    while (L>>=1)
+//        P<<=1;
+//    for(int i=0;i<8;i++)
+//        light_group_writePin(L0<<i,code_table[num]&0x01);
+//    lock();
     unlock();
-    HAL_GPIO_WritePin(GPIOB,SEL0,pos&0x01);
-    HAL_GPIO_WritePin(GPIOB,SEL1,(pos>>1)&0x01);
-    HAL_GPIO_WritePin(GPIOB,SEL2,(pos>>2)&0x01);
+    HAL_GPIO_WritePin(LOCK_GROUP,SEL0|SEL1|SEL2,0);
+    HAL_GPIO_WritePin(LOCK_GROUP,pos&0x07,1);
     light_group_writePin(ALL_LED,0);
-    while (L>>=1)
-        P<<=1;
-    light_group_writePin(ALL_LED,0);
-    light_group_writePin(P,1);
-//    for(i=0;i<8;i++)
-//        light_group_writePin(L0<<i,(code_table[num]>>i&0x01));
+    light_group_writePin(code_table[num]<<8,1);
     lock();
 }
 
@@ -131,25 +133,13 @@ void digital_tube_display_char(int pos,char *c){
         else
             digital_tube_display(pos, TUBE_OFF);
 }
-//
-//void digital_tube_display_string_IT(void){
-//    extern char Tube_String8[16];
-//    static int pos=0;
-//    char *s=;
-//    char temp[2];
-//    temp[0]=*(Tube_String8+pos);
-//    if((*(s+1)=='.')){
-//        temp[1]='.';
-//        digital_tube_display_char(pos++,temp);
-//        s+=2;
-//    }else{
-//        temp[1]='\0';
-//        digital_tube_display_char(pos++,temp);
-//        s++;
-//    }
-//    if(!s)
-//        s=Tube_String8;
-//}
+/*这个函数应该是使用最多的了,放在定时器*/
+void digital_tube_display_string_IT(void){
+    static int pos=0;
+    char *s=Tube_String8[pos];
+    digital_tube_display_char(pos++,s);
+    pos=pos>7?0:pos;
+}
 
 void digital_tube_display_string(int pos,char *s){
     char temp[2];

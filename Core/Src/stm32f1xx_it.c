@@ -1,6 +1,7 @@
 /* USER CODE BEGIN Header */
 #include <stdlib.h>
 #include "myAPI.h"
+
 /**
   ******************************************************************************
   * @file    stm32f1xx_it.c
@@ -28,7 +29,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-int I=0;
+int cnt_press=0;
+//int play_flag=1;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,7 +60,6 @@ int I=0;
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim3;
-extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -204,15 +205,17 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles EXTI line0 interrupt.
   */
+//extern char Tube_String8[8][2];
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
 
+    cnt_press++;
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
+
     led_display_bits(0xf0);
-    set_cnt(I++);
 
   /* USER CODE END EXTI0_IRQn 1 */
 }
@@ -223,12 +226,19 @@ void EXTI0_IRQHandler(void)
 void EXTI1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI1_IRQn 0 */
-
+static int i=0;
   /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
   /* USER CODE BEGIN EXTI1_IRQn 1 */
     led_display_bits(0xff);
-    play();
+    i++;
+    if(i%2)
+        disable_play();
+    else
+    {enable_play();
+        play();
+
+    }
   /* USER CODE END EXTI1_IRQn 1 */
 }
 
@@ -243,7 +253,7 @@ void EXTI2_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
   /* USER CODE BEGIN EXTI2_IRQn 1 */
     led_display_bits(0x0);
-    set_cnt(I--);
+    cnt_press--;
   /* USER CODE END EXTI2_IRQn 1 */
 }
 
@@ -261,20 +271,6 @@ void TIM3_IRQHandler(void)
 
 //    digital_tube_display(0,i);
   /* USER CODE END TIM3_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USART1 global interrupt.
-  */
-void USART1_IRQHandler(void)
-{
-  /* USER CODE BEGIN USART1_IRQn 0 */
-
-  /* USER CODE END USART1_IRQn 0 */
-  HAL_UART_IRQHandler(&huart1);
-  /* USER CODE BEGIN USART1_IRQn 1 */
-
-  /* USER CODE END USART1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

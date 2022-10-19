@@ -1,8 +1,9 @@
 #ifndef _myAPI_h_
 #define _myAPI_h_
 #include "main.h"
-static char Tube_String8[16];
+extern char Tube_String8[8][2];
 static int Cnt_press=0;
+//extern int play_flag;
 int get_cnt(void);
 void set_cnt(int i);
 //LED灯
@@ -20,4 +21,6 @@ void test_smg_in_while1(void);//放在大循环中用于测试数码管
 void digital_tube_display_string_IT(void);//在中断中刷新数码管
 //蜂鸣器
 void play();//播放阴乐
+void enable_play(void);
+void disable_play(void);
 #endif

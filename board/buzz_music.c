@@ -9,8 +9,15 @@
 #define u8 uint8_t
 #define uc16 unsigned int
 #define PBeep(x) HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,(x))
-
 #define CPU_FREQUENCY_MHZ    8	// STM32时钟主频
+static int play_flag=0;
+void enable_play(void){
+    play_flag=1;
+}
+void disable_play(void){
+    play_flag=0;
+}
+
 void set_up(void){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     GPIO_InitStruct.Pin = GPIO_PIN_5;
@@ -89,8 +96,6 @@ void play(void)
                 6,2,4,4,8,2,2,2,2
     };
 
-//	u8 music[]={13,1,2,3,4,5,6,7,8};//测试基础音
-//	u8 time[] ={4, 4,4,4,4,4,4,4,4};
 
     u32 yanshi;
     u16 i,e;
