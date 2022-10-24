@@ -1,6 +1,6 @@
 /* USER CODE BEGIN Header */
-#include <stdlib.h>
-#include <string.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include "myAPI.h"
 /**
   ******************************************************************************
@@ -29,15 +29,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-char Tube_String8[8][2]={"h",
-                         "e",
-                         "l",
-                         "l",
-                         "o",
-                         " ",
-                         " ",
-                         " "
-};
+//
 extern int cnt_press;
 /* USER CODE END PTD */
 
@@ -139,10 +131,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//      HAL_UART_Transmit(&huart1,"hello\n",sizeof "hello\n",1);
-//      HAL_Delay(1000);
-//      digital_tube_display_string(0,"Hello12.3");
-//    test_smg_in_while1();
+      cnt_press=cnt_press>=1000?0:cnt_press;
+      cnt_press=cnt_press<0?999:cnt_press;
+      play_num_it(1,3,-1*cnt_press);
+      play_float_it(5,7,1.23,2);
+      HAL_Delay(1);
+      play_string_it(0,"C");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -326,12 +320,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == (&htim3))
     {
 
-        Tube_String8[0][0]=cnt_press/100%10+'0';
-        Tube_String8[0][1]=0;
-        Tube_String8[1][0]=cnt_press/10%10+'0';
-        Tube_String8[0][1]=0;
-        Tube_String8[2][0]=cnt_press%10+'0';
-        Tube_String8[0][1]=0;
         digital_tube_display_string_IT();
     }
 }
