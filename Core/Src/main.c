@@ -121,10 +121,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-    smg_init();
+  smg_init();
     /* USER CODE BEGIN 2 */
-    /*使能定时器1中断*/
-    HAL_TIM_Base_Start_IT(&htim3);
+    /*使能定时器中断*/
+  HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
   /* Infinite loop */

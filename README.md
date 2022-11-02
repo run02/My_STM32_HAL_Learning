@@ -89,13 +89,16 @@ int main(void)
 
 ```c
 //数码管
-extern char Tube_String8[8][2];
 void smg_init(void);   //数码管初始化
 void digital_tube_display(int pos,int num); //按照字母表里的数字显示
-void digital_tube_display_char(int pos,char *c); //可显示0-9,a-z的字符,带小数点的.
+void digital_tube_display_char(int pos,const char *c); //可显示0-9,a-z的字符,带小数点的.
 void digital_tube_display_string(int pos,char *s);//从指定位置开始显示任意值,可显示浮点数,最多显示的数量取决于剩下多少数码管
-void digital_tube_display_string_IT(void);//在中断中刷新数码管
 void test_smg_in_while1(void);//放在大循环中用于测试数码管
+/*以下也是关于数码管的部分好用且常用*/
+void digital_tube_display_string_IT(void);//在中断中刷新数码管
+void play_string_it(int pos,const char *s);/*从指定位开始显示字符串*/
+void play_num_it(int start,int end,int num);/*在指定范围内显示整数*/
+void play_float_it(int start,int end,float num,int len_after_point);/*在指定空间内显示小数,可设置保留几位小数点*/
 ```
 
 #### 一个极简的例子
@@ -127,58 +130,45 @@ int main(void)
 
 #### 使用方法简介
 
-`extern char Tube_String8[8][2]`
+- 初始化
 
->  这个变量用来存每一个数码管显示什么,因为可能有显示小数点的需求,所以每一个长度是两位,这样就放得类似于`"1."`这样的内容了.
->
-> 板子上一共有8个数码管,所以长度是8.
->
-> 支持显示1-9,a-z,带小数点的1-9.
+![image-20221102145334895](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221102145334895.png)
 
 
 
-- 在第0位显示数字1:
 
-  ```c
-  Tube_String8[0][0]=1+'0';
-  Tube_String8[0][1]='\0';
-  ```
 
-- 在第零位和第一位显示`1.2`:
+及其推荐使用在中断中刷新数码管的方法.
 
-  ```c
-  Tube_String8[0][0]=1+'0';
-  Tube_String8[0][1]='.';
-  Tube_String8[1][0]=2+'0';
-  Tube_String8[1][1]='\0';
-  ```
+- void digital_tube_display_string_IT(void);//在中断中刷新数码管
 
-- 在第二位显示字幕H
+  需要把这个函数放到中断里
 
-  ```c
-  Tube_String8[2][0]='H';
-  Tube_String8[2][1]='\0';
-  ```
+  ![image-20221102145111525](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221102145111525.png)
 
-`Lab2`中使用到数码管的关键部分:
+- void play_string_it(int pos,const char *s);*
 
-```c
-/* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim == (&htim3))
-    {
-        Tube_String8[0][0]=cnt_press/100%10+'0';
-        Tube_String8[0][1]=0;
-        Tube_String8[1][0]=cnt_press/10%10+'0';
-        Tube_String8[0][1]=0;
-        Tube_String8[2][0]=cnt_press%10+'0';
-        Tube_String8[0][1]=0;
-        digital_tube_display_string_IT();
-    }
-}
-/* USER CODE END 4 */
-```
+  从指定位开始显示字符串
+
+- void play_num_it(int start,int end,int num);
+
+  在指定范围内显示整数
+
+- void play_float_it(int start,int end,float num,int len_after_point);
+
+  在指定空间内显示小数,可设置保留几位小数点
+
+#### 示例
+
+1. 切换到示例的分支:
+
+   ```shell
+   git checkout lab2-tubeDisplay
+   ```
+
+2. 下载程序到开发板
+
+
 
 ### 蜂鸣器
 
