@@ -1,179 +1,228 @@
-# 湖大STM32开发板HAL库上层驱动
+# 实验4 DMA串口
 
-最近学校开了STM32的课,教学使用的芯片是湖南大学的基于STM32F103VBT6的板子,板子上集成了Jlink调试(也就是说接一根数据线就能使用板子上自带的Jlink调试),自带很多小模块:LED,蜂鸣器,数码管,光敏,按键,等等.
+这里是实验4的分支,本章实验主要是使用串口+DMA与其它设备通信.
 
-美中不足的是给出的示例程序都是固件库(ST官方已经停止对固件库的维护),开发环境用的是keil.
+下载示例程序后打开串口调试助手,连续发送一百个字符后会得到回应.
 
-自己比较喜欢用HAL库+CLion+CubeMX这套环境,  反正也要写实验报告, 正好借此机会封装一些模块. 这样对这套板子也有HAL库的示例程序了,后边的同学如果想用HAL库开发,看这个找个例程使用起来也会舒服的多. 
+完成这个实验无需其它实验写的驱动模块,只需要按照顺序再main.c中调用HAL库提供的函数即可.
+## 实验内容
 
-## 仓库的文件结构
+**USART1（采用DMA接收数据）与PC机通信。**
 
-![image-20221019210529855](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221019210529855.png)
+**用PC端串口调试助手，向开发板的USART1（开发板的COM口）每隔200ms周期性发送一个字符，STM32F103VBT6每收到100个字符，向串口调试助手发送一个字符串的提示信息。**
 
-箭头标注的以及圈起来的是我们自己可以写代码的区域,其它的都来自ST提供的初始化代码.
+## 原理
 
-每个小模块的驱动都写在board目录下,
+#### 潦草但是易懂的原理描述
 
-头文件在board/Inc目录下,就是那个myAPI头文件,驱动封装好了直接给出上层调用的接口,加起来也不会有多少所以就放到一个头文件里了.
+按照课程学习的顺序,大部分是先学的计算机组成原理,然后再是单片机,然后是嵌入式原理.
 
-**每个模块会在下文中给出快速使用的例子和简介.**
+接收串口有很多种方法,有直接阻塞接收的(比如说当时写智能小车的时候我就是写的阻塞接收的),有中断接收的,比如C51的串口接收(STM32也可以中断接收),还有就是DMA接收.
 
-## 开发板
+简单谈一下我对DMA的理解:
 
-![image-20221019204953177](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221019204953177.png)
+阻塞接收是最好理解的,就是一次只能干一件事,这次轮到收串口数据了,就等着,然后接收完了或者是发送完了再干别的事.适用于特别简单的场景.
 
-![image-20221019204900926](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221019204900926.png)
+中断接收就是有消息来了,就中断出去,很快啊,然后再回来,不影响干别的事,也能接收数据.就像是边写作业边吃零食,写一会,突然吃一口,然后再回来写.这种方式就比较灵活了,能"同时"干两件事,但是CPU会比较"累".
 
-## 环境配置
+DMA(Data Asset Memory),就是数据来了,让另一个芯片把数据搬到我的内存里.相当于边写作业边找另一个人帮我做家务,我只需要告诉他一声帮我做家务.这种方法最爽了,缺点估计是多来了个芯片,比较贵.
 
-这个比较慢,先留个坑
+感觉还是DMA接收最简单好用.
 
-### STM32CubeIDE
+#### 原理图
 
-CubeIDE是ST官方给出的开发环境, 对于装环境而言是最快速的, 基本上下载好了打开个工程就可以运行, 用起来和Eclipse差不多.
+这里发现板子上有个COM口,顺藤摸瓜最后找到是PA9和PA10
 
-### CLion+CubeMX+OpenOcd+Arm-None-Eabi+MinGW+J-Link
+![image-20221104195917987](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104195917987.png)
 
-这套环境用起来最舒服,但配起来相对而言麻烦一些,这里太麻烦了,先欠着,后续随缘补上.
 
-### CubeMX+Keil
 
-特别钟爱Keil也可以用CubeMX+Keil进行开发
+![image-20221104200107416](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104200107416.png)
 
-## 接口文档与示例
+![image-20221104200138356](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104200138356.png)
 
-### LED
+用CubeMx的好处这就出来了,直接自带原理图,带配置的各种框图,简直爽到飞起.
 
-#### 接口介绍
+直接看原理图看手册和直接看cube的区别就像是直接查字典和从网上搜索单词.
 
-- void led_init(void);
 
-  初始化LED灯
 
-- void led_display_bits(uint32_t value);
+## 实验步骤
 
-  一下子设置八位LED的状态,从左到右依次对应L7->L0
+用cube一开始畏首畏尾不敢乱动,但是用熟练了之后发现,还是很爽的,基本上全都是那一套配置的模式.简直爽到飞起!
 
-- void led_display_write_bit(int pos,int value);
+配置的原理部分放在参考里了,这里不再赘述.
 
-  LED位带操作
+#### 配置串口1:
 
-- void test_led(void);
+这里试了一下,连接com口的线不支持USART,只能支持UART.再USART传输的时候,可以收到单片机的数据,但是不能发送数据.
 
-  放在大循环中用于测试LED的两个函数
+![image-20221104193447459](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104193447459.png)
 
-#### 一个极简的例子
+![image-20221104193403596](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104193403596.png)
+
+#### 配置中断:
+
+![image-20221104193422069](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104193422069.png)
+
+#### 配置DMA:
+
+这里模式还有circular模式,就是自动装填,比如说接收了1000个字之后,它自己会再接收1000个字,一直循环.发送也是,这里因为实验的需求,需要等到他收到一百个做点什么,就用回调函数的方法.
+
+一开始本来想看看DMA有什么回调函数,但是没找到,只有串口接收的回调函数,就只好用它了.
+
+![image-20221104193321717](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104193321717.png)
+
+#### 代码
+
+经过了上述配置,代码反倒是比较好写,基本上只用得到这些就能完成本次实验:
 
 ```c
-#include "myAPI.h"
+uint8_t tx_buffer[]="This is transmit by DMA\n";
+uint8_t rx_buffer[400]={0};
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+    if(UartHandle == &huart1){
+        /*接收数据完成后*/
+        if(HAL_UART_Receive_DMA(&huart1,rx_buffer,100)==HAL_OK){
+            uint8_t s[]="have sent 100 words";
+            HAL_UART_Transmit_DMA(&huart1,s,sizeof s);
+        }
+    }
+}
+HAL_UART_Receive_IT(&huart1,rx_buffer,100);
+HAL_UART_Receive_DMA(&huart1,rx_buffer,100);
+```
+
+
+
+```c
+#include "main.h"
+
+UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
+
+/* USER CODE BEGIN PV */
+uint8_t tx_buffer[]="This is transmit by DMA\n";
+uint8_t rx_buffer[400]={0};
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+    if(UartHandle == &huart1){
+        /*接收数据完成后*/
+        if(HAL_UART_Receive_DMA(&huart1,rx_buffer,100)==HAL_OK){
+            uint8_t s[]="have sent 100 words";
+            HAL_UART_Transmit_DMA(&huart1,s,sizeof s);
+        }
+    }
+}
+
 int main(void)
 {
   HAL_Init();
   SystemClock_Config();
-  led_init();
-  while (1)
-  {	
-      	//0b表示二进制的,最直观,从左到右就对应八个灯,这里是亮最左边的四个灯
-		led_display_bits(0b11110000);
-      	HAL_Delay(1000);//延时一秒
-      	//熄灭所有灯
-        led_display_bits(0b00000000);
-      	HAL_Delay(1000);
-  }
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART1_UART_Init();
+  MX_TIM3_Init();
+  /* USER CODE BEGIN 2 */
+    HAL_UART_Receive_IT(&huart1,rx_buffer,100);
+    HAL_UART_Receive_DMA(&huart1,rx_buffer,100);
+
+    while (1)
+    {
+//        HAL_UART_Transmit_DMA(&huart1,tx_buffer,sizeof tx_buffer);
+//        HAL_Delay(1000);
+//        HAL_UART_Transmit_DMA(&huart1,rx_buffer,sizeof rx_buffer);
+//        HAL_Delay(1000);
+    }
 }
-```
 
-把以上程序粘贴到工程的main函数中,观察变化,可以很快搞定怎么用.
 
-### 数码管
-
-```c
-//数码管
-void smg_init(void);   //数码管初始化
-void digital_tube_display(int pos,int num); //按照字母表里的数字显示
-void digital_tube_display_char(int pos,const char *c); //可显示0-9,a-z的字符,带小数点的.
-void digital_tube_display_string(int pos,char *s);//从指定位置开始显示任意值,可显示浮点数,最多显示的数量取决于剩下多少数码管
-void test_smg_in_while1(void);//放在大循环中用于测试数码管
-/*以下也是关于数码管的部分好用且常用*/
-void digital_tube_display_string_IT(void);//在中断中刷新数码管
-void play_string_it(int pos,const char *s);/*从指定位开始显示字符串*/
-void play_num_it(int start,int end,int num);/*在指定范围内显示整数*/
-void play_float_it(int start,int end,float num,int len_after_point);/*在指定空间内显示小数,可设置保留几位小数点*/
-```
-
-#### 一个极简的例子
-
-```c
-#include "myAPI.h"
-int main(void)
+void SystemClock_Config(void)
 {
-  HAL_Init();
-  SystemClock_Config();
-  smg_init();
-  while (1)
-  {	
-      	//0b表示二进制的,最直观,从左到右就对应八个灯,这里是亮最左边的四个灯
-		 digital_tube_display_string(0,"Hell012.3");
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
   }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+static void MX_USART1_UART_Init(void)
+{
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+
 }
 ```
 
-把以上程序粘贴到工程的main函数中,观察变化,可以很快搞定怎么用.
+## 实验结果
 
-#### 在中断中刷新数码管
+不停发送数据,直到发送长度加起来达到一百个,收到最近发送的一百条数据后回复:
 
-**您可以切换到`Lab2`分支,将程序下载进入开发板**,
+![image-20221104195215952](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221104195215952.png)
 
-- 按下从右往左数第一个按键会让显示的数字-1,
-- 按下从右往左数第二个按键会播放阴乐,
-- 按下从右往左数第三个按键会让显示的数字+1.
-
-#### 使用方法简介
-
-- 初始化
-
-![image-20221102145334895](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221102145334895.png)
+## 总结
 
 
 
+## 参考
 
+[【STM32】HAL库 STM32CubeMX教程十一---DMA (串口DMA发送接收)_Z小旋的博客-CSDN博客_stm32cubemx dma](https://blog.csdn.net/as480133937/article/details/104827639)
 
-及其推荐使用在中断中刷新数码管的方法.
-
-- void digital_tube_display_string_IT(void);//在中断中刷新数码管
-
-  需要把这个函数放到中断里
-
-  ![image-20221102145111525](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221102145111525.png)
-
-- void play_string_it(int pos,const char *s);*
-
-  从指定位开始显示字符串
-
-- void play_num_it(int start,int end,int num);
-
-  在指定范围内显示整数
-
-- void play_float_it(int start,int end,float num,int len_after_point);
-
-  在指定空间内显示小数,可设置保留几位小数点
-
-#### 示例
-
-1. 切换到示例的分支:
-
-   ```shell
-   git checkout lab2-tubeDisplay
-   ```
-
-2. 下载程序到开发板
+[STM32+ HAL+ DMA+ USART_戈 扬的博客-CSDN博客](https://blog.csdn.net/xuzhexing/article/details/104138920#:~:text=在HAL使用DMA方式进行串口数据传输时%2CDMA全局中断模式是必需打开的，因此在DMA方式进行数据传输时（收，发），在数据传输过半，完成均会触发DMA中断；HAL_DMA_IRQHandler,(%26hdma_usart2_tx)会根据中断标识%2C调用传输过半%2F完成%2F错误%2C回调函数)
 
 
 
-### 蜂鸣器
 
-目前开发尚未完善.
 
-### 按键
-
-关于按键其实代码要写的并不多,只需要在CubeMX中配置,然后在对应的回调函数中写处理的逻辑即可.

@@ -1,7 +1,4 @@
 /* USER CODE BEGIN Header */
-//#include <stdlib.h>
-//#include <string.h>
-#include "myAPI.h"
 /**
   ******************************************************************************
   * @file           : main.c
@@ -29,8 +26,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-//
-extern int cnt_press;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -46,45 +42,35 @@ extern int cnt_press;
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
-
+uint8_t tx_buffer[]="This is transmit by DMA\n";
+uint8_t rx_buffer[400]={0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+    if(UartHandle == &huart1){
+        /*接收数据完成后*/
+        if(HAL_UART_Receive_DMA(&huart1,rx_buffer,100)==HAL_OK){
+            uint8_t s[]="have sent 100 words";
+            HAL_UART_Transmit_DMA(&huart1,s,sizeof s);
+        }
+    }
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//UART.c
-#define MAX_REC_LENGTH 500
-#define REC_LENGTH 5
-unsigned char UART1_Rx_Buf[MAX_REC_LENGTH] = {0}; //USART1存储接收数据
-unsigned char UART1_Rx_flg = 0;                   //USART1接收完成标志
-unsigned int  UART1_Rx_cnt = 0;                   //USART1接受数据计数�??
-unsigned char UART1_temp[REC_LENGTH] = {0};       //USART1接收数据缓存
-
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if(huart->Instance==USART1)
-    {
-        UART1_Rx_Buf[UART1_Rx_cnt] = UART1_temp[0];
-        UART1_Rx_cnt++;
-        if(0x0a == UART1_temp[0])
-        {
-            UART1_Rx_flg = 1;
-        }
-        HAL_UART_Receive_IT(&huart1,(uint8_t *)UART1_temp,REC_LENGTH);
-    }
-}
-
 
 /* USER CODE END 0 */
 
@@ -92,11 +78,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   * @brief  The application entry point.
   * @retval int
   */
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-//strcpy(Tube_String8,"123456\0");
 
   /* USER CODE END 1 */
 
@@ -118,29 +102,28 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  smg_init();
-    /* USER CODE BEGIN 2 */
-    /*ʹ�ܶ�ʱ���ж�*/
-  HAL_TIM_Base_Start_IT(&htim3);
+    HAL_UART_Receive_IT(&huart1,rx_buffer,100);
+    HAL_UART_Receive_DMA(&huart1,rx_buffer,100);
   /* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-      cnt_press=cnt_press>=1000?0:cnt_press;
-      cnt_press=cnt_press<0?999:cnt_press;
-      play_num_it(1,3,-1*cnt_press);
-      play_float_it(5,7,1.23,2);
-      HAL_Delay(1);
-      play_string_it(0,"C");
-    /* USER CODE END WHILE */
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1)
+    {
+//        HAL_UART_Transmit_DMA(&huart1,tx_buffer,sizeof tx_buffer);
+//        HAL_Delay(1000);
+//        HAL_UART_Transmit_DMA(&huart1,rx_buffer,sizeof rx_buffer);
+//        HAL_Delay(1000);
+        /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
+
+
+        /* USER CODE BEGIN 3 */
+    }
   /* USER CODE END 3 */
 }
 
@@ -253,8 +236,27 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-    HAL_UART_Receive_IT(&huart1,(uint8_t *)UART1_temp,REC_LENGTH);
+
   /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 
 }
 
@@ -268,7 +270,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -279,12 +280,6 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PC0 PC1 PC2 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PE8 PE9 PE10 PE11
                            PE12 PE13 PE14 PE15 */
@@ -302,27 +297,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim == (&htim3))
-    {
 
-        digital_tube_display_string_IT();
-    }
-}
 /* USER CODE END 4 */
 
 /**
