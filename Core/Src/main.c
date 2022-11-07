@@ -1,6 +1,4 @@
 /* USER CODE BEGIN Header */
-//#include <stdlib.h>
-//#include <string.h>
 #include "myAPI.h"
 /**
   ******************************************************************************
@@ -30,7 +28,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //
-extern int cnt_press;
+int buzz_play_flag=2;//这个变量用来控制buzz
+static int cnt_press=0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -44,9 +43,6 @@ extern int cnt_press;
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim3;
-
-UART_HandleTypeDef huart1;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -54,7 +50,6 @@ UART_HandleTypeDef huart1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -63,28 +58,44 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 //UART.c
-#define MAX_REC_LENGTH 500
-#define REC_LENGTH 5
-unsigned char UART1_Rx_Buf[MAX_REC_LENGTH] = {0}; //USART1存储接收数据
-unsigned char UART1_Rx_flg = 0;                   //USART1接收完成标志
-unsigned int  UART1_Rx_cnt = 0;                   //USART1接受数据计数�??
-unsigned char UART1_temp[REC_LENGTH] = {0};       //USART1接收数据缓存
 
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+#define Key_GPIO_Group GPIOC
+#define K3 GPIO_PIN_0
+#define K2 GPIO_PIN_1
+#define K1 GPIO_PIN_2
+//缺陷是按键2没法消抖,有点难受
+void HAL_GPIO_EXTI_Callback(uint16_t key)
 {
-    if(huart->Instance==USART1)
+    if(!HAL_GPIO_ReadPin(Key_GPIO_Group,key))
+        return;
+    if(key==K3){
+        cnt_press=cnt_press>=1000?0:++cnt_press;
+        led_display_bits(0xf0);//因为硬件资源的冲突,LED灯会闪一下,而不是保持一直亮的状态
+        play_num_it(1,3,cnt_press);
+    }else if(key==K2){
+        static int i=2;
+        buzz_play_flag= (i++) % 3;
+        if(i==4) i=1;
+        play_num_it(6, 7, buzz_play_flag);
+    }else if(key==K1){
+        led_display_bits(0x0);
+        cnt_press=cnt_press<0?999:--cnt_press;
+        play_num_it(1,3,cnt_press);
+    }
+//    HAL_Delay(20); //本来想延时消抖,但是会卡死,数码管直接黑屏,所以在上边用了扫描按键状态消抖.
+/*
+ 还有一种方法是在定时器里扫描,在定时器里边扫描,每次进来的时候会随着定时器中断进入的周期消抖.
+ 这种方法比较麻烦,但是稳定.
+*/
+}
+/*定时器的回调函数,达到设定的时间就会调用这个函数,多个定时器共享这一个,通过传入的参数进行区分*/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim == (&htim3))
     {
-        UART1_Rx_Buf[UART1_Rx_cnt] = UART1_temp[0];
-        UART1_Rx_cnt++;
-        if(0x0a == UART1_temp[0])
-        {
-            UART1_Rx_flg = 1;
-        }
-        HAL_UART_Receive_IT(&huart1,(uint8_t *)UART1_temp,REC_LENGTH);
+        digital_tube_display_string_IT();
     }
 }
-
 
 /* USER CODE END 0 */
 
@@ -92,7 +103,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   * @brief  The application entry point.
   * @retval int
   */
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -118,25 +128,22 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
+
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  buzz_init();
   smg_init();
+
     /* USER CODE BEGIN 2 */
-    /*ʹ�ܶ�ʱ���ж�*/
   HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    play_string_it(0,"C");
   while (1)
   {
-      cnt_press=cnt_press>=1000?0:cnt_press;
-      cnt_press=cnt_press<0?999:cnt_press;
-      play_num_it(1,3,-1*cnt_press);
-      play_float_it(5,7,1.23,2);
-      HAL_Delay(1);
-      play_string_it(0,"C");
+      play();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -156,9 +163,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -169,8 +175,8 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
@@ -178,6 +184,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
 }
 
 /**
@@ -225,38 +232,8 @@ static void MX_TIM3_Init(void)
 
 }
 
-/**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
 
-  /* USER CODE BEGIN USART1_Init 0 */
 
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-    HAL_UART_Receive_IT(&huart1,(uint8_t *)UART1_temp,REC_LENGTH);
-  /* USER CODE END USART1_Init 2 */
-
-}
 
 /**
   * @brief GPIO Initialization Function
@@ -295,6 +272,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pin : PB3 */
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -303,26 +286,19 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 18, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 19, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 20, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim == (&htim3))
-    {
 
-        digital_tube_display_string_IT();
-    }
-}
 /* USER CODE END 4 */
 
 /**
