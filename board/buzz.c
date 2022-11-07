@@ -21,9 +21,6 @@ void buzz_init(void){
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 }
-void buzz(int value){
-    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,value);
-}
 
 
 
@@ -124,3 +121,6 @@ void play(void)
 
 }
 
+void buzz(int value){
+    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,value);
+}

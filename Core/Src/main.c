@@ -56,9 +56,10 @@ DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE BEGIN PV */
 uint8_t tx_buffer[]="This is transmit by DMA\n";
 uint8_t rx_buffer[400]={0};
-int threshold=0;
+int threshold=20;
 uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
 uint8_t i2c_rx_buffer[8];
+float temp;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,7 +74,7 @@ static void MX_ADC1_Init(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
     if(UartHandle == &huart1){
-        /*接收数据完成�??*/
+        /*接收数据完成�????*/
         if(HAL_UART_Receive_DMA(&huart1,rx_buffer,100)==HAL_OK){
             uint8_t s[]="have sent 100 words";
             HAL_UART_Transmit_DMA(&huart1,s,sizeof s);
@@ -85,6 +86,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == (&htim3))
     {
         digital_tube_display_string_IT();
+        if (temp>threshold){
+            static int i=0;
+            if(i<5){
+                buzz(0);
+            }else{
+                buzz(1);
+            }
+            if(i++==10){
+                i=0;
+            }
+        }
     }
 }
 
@@ -130,6 +142,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
     smg_init();
+    buzz_init();
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_UART_Receive_IT(&huart1,rx_buffer,100);
     HAL_UART_Receive_DMA(&huart1,rx_buffer,100);
@@ -139,18 +152,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1)
     {
-//        HAL_I2C_Mem_Read(&hi2c1, ADDR_EEPROM_Read, 0, I2C_MEMADD_SIZE_8BIT,i2c_rx_buffer,sizeof i2c_rx_buffer, 0xff);
-//        HAL_Delay(2000);
-//        HAL_UART_Transmit(&huart1,"read EEPROM data: ",sizeof "read EEPROM data: ",1);
-//        HAL_UART_Transmit(&huart1,i2c_rx_buffer, strlen(i2c_tx_buffer),1);
-        int advalue;
-        int temp;
 
+        temp=calculate_to_temperature(measure_the_temperature());
+        play_float_it(0,3, temp,1);
+        play_num_it(4,7, threshold);
 
-//        int value=12345;
-//        play_num_it(0,7,advalue);
-        play_float_it(0,3, calculate_to_temperature(measure_the_temperature()),1);
-        play_float_it(4,7, calculate_to_temperature(measure_the_temperature()),1);
         HAL_Delay(300);
 
     /* USER CODE END WHILE */
@@ -408,6 +414,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(temperature_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : PC0 PC1 PC2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PE8 PE9 PE10 PE11
                            PE12 PE13 PE14 PE15 */
   GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
@@ -423,6 +435,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 15, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 15, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 15, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
 }
 

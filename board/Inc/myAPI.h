@@ -29,4 +29,8 @@ void play();//播放阴乐
 float calculate_to_temperature(int ad);/*把12位温度模拟量转换位浮点数的温度*/
 int measure_the_temperature(void);/*以阻塞的方式测量一次温度,12位精度*/
 
+
+//按键初始化
+void key_exti_gpio_init(void);
+/*按键的其它功能使用回调函数实现,里边主要是处理逻辑,不太好写对外提供的服务*/
 #endif
