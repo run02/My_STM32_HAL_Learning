@@ -10,32 +10,8 @@
 #define uc16 unsigned int
 #define PBeep(x) HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,(x))
 #define CPU_FREQUENCY_MHZ    8	// STM32时钟主频
-extern int buzz_play_flag;
-//             低7  1   2   3   4   5   6   7  高1 高2  高3 高4 高5 不发音
-const uc16 tone[] = {247,262,294,330,349,392,440,494,523,587,659,698,784,850,1000};//音频数据表
 
-//小燕子
-const u8 music[]={2,1,2,1,2,3,5,3,
-                  2,1,2,1,2,3,2,1,6,
-                  2,1,2,1,2,3,5,3,
-                  2,3,2,1,2,0,
-                  2,1,2,1,2,3,5,3,
-                  2,3,2,1,6,3,2,1,2
-};
 
-const u8 time[] ={6,2,6,2,4,4,4,4,//时间
-                  6,2,6,2,2,2,2,8,
-                  6,2,6,2,4,4,4,4,
-                  6,2,4,4,8,8,
-                  6,2,6,2,4,4,4,4,
-                  6,2,4,4,8,2,2,2,2
-};
-//void enable_play(void){
-//    buzz_play_flag=1;
-//}
-//void disable_play(void){
-//    buzz_play_flag=0;
-//}
 
 void buzz_init(void){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -45,6 +21,14 @@ void buzz_init(void){
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 }
+void buzz(int value){
+    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,value);
+}
+
+
+
+
+
 
 void delay_us(__IO uint32_t delay)
 {
@@ -95,6 +79,26 @@ void Sound(u16 frq)
 
 void play(void)
 {
+    extern int buzz_play_flag;
+//             低7  1   2   3   4   5   6   7  高1 高2  高3 高4 高5 不发音
+    const uc16 tone[] = {247,262,294,330,349,392,440,494,523,587,659,698,784,850,1000};//音频数据表
+
+//小燕子
+    const u8 music[]={2,1,2,1,2,3,5,3,
+                      2,1,2,1,2,3,2,1,6,
+                      2,1,2,1,2,3,5,3,
+                      2,3,2,1,2,0,
+                      2,1,2,1,2,3,5,3,
+                      2,3,2,1,6,3,2,1,2
+    };
+
+    const u8 time[] ={6,2,6,2,4,4,4,4,//时间
+                      6,2,6,2,2,2,2,8,
+                      6,2,6,2,4,4,4,4,
+                      6,2,4,4,8,8,
+                      6,2,6,2,4,4,4,4,
+                      6,2,4,4,8,2,2,2,2
+    };
     u32 yanshi;
     u16 i,e;
     yanshi = 6;//10;  4;  2

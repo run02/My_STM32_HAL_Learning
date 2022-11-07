@@ -22,5 +22,11 @@ void play_float_it(int start,int end,float num,int len_after_point);/*在指定�
 
 //蜂鸣器
 void buzz_init(void);
+void buzz(int value);
 void play();//播放阴乐
+
+//adc转换
+float calculate_to_temperature(int ad);/*把12位温度模拟量转换位浮点数的温度*/
+int measure_the_temperature(void);/*以阻塞的方式测量一次温度,12位精度*/
+
 #endif
