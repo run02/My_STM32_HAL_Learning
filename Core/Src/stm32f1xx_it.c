@@ -1,6 +1,5 @@
 /* USER CODE BEGIN Header */
-#include <stdlib.h>
-#include "myAPI.h"
+
 
 /**
   ******************************************************************************
@@ -29,8 +28,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-int cnt_press=0;
-//int play_flag=1;
+
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -203,19 +201,31 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles RCC global interrupt.
+  */
+void RCC_IRQHandler(void)
+{
+  /* USER CODE BEGIN RCC_IRQn 0 */
+
+  /* USER CODE END RCC_IRQn 0 */
+  /* USER CODE BEGIN RCC_IRQn 1 */
+
+  /* USER CODE END RCC_IRQn 1 */
+}
+
+/**
   * @brief This function handles EXTI line0 interrupt.
   */
-//extern char Tube_String8[8][2];
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
 
-    cnt_press++;
+
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
 
-    led_display_bits(0xf0);
+
 
   /* USER CODE END EXTI0_IRQn 1 */
 }
@@ -226,19 +236,14 @@ void EXTI0_IRQHandler(void)
 void EXTI1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI1_IRQn 0 */
-static int i=0;
+
   /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
   /* USER CODE BEGIN EXTI1_IRQn 1 */
-    led_display_bits(0xff);
-    i++;
-    if(i%2)
-        disable_play();
-    else
-    {enable_play();
-        play();
+//    led_display_bits(0xff);
 
-    }
+//    HAL_Delay(10);
+
   /* USER CODE END EXTI1_IRQn 1 */
 }
 
@@ -252,8 +257,7 @@ void EXTI2_IRQHandler(void)
   /* USER CODE END EXTI2_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
   /* USER CODE BEGIN EXTI2_IRQn 1 */
-    led_display_bits(0x0);
-    cnt_press--;
+
   /* USER CODE END EXTI2_IRQn 1 */
 }
 
@@ -267,9 +271,7 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-    //    static int i=0;
 
-//    digital_tube_display(0,i);
   /* USER CODE END TIM3_IRQn 1 */
 }
 
