@@ -1,7 +1,6 @@
 #ifndef _myAPI_h_
 #define _myAPI_h_
 #include "main.h"
-//extern char Tube_String8[8][2];
 
 //LED灯
 void led_init(void);
@@ -20,8 +19,8 @@ void digital_tube_display_string_IT(void);//在中断中刷新数码管
 void play_string_it(int pos,const char *s);/*从指定位开始显示字符串*/
 void play_num_it(int start,int end,int num);/*在指定范围内显示整数*/
 void play_float_it(int start,int end,float num,int len_after_point);/*在指定空间内显示小数,可设置保留几位小数点*/
+
 //蜂鸣器
+void buzz_init(void);
 void play();//播放阴乐
-void enable_play(void);
-void disable_play(void);
 #endif
