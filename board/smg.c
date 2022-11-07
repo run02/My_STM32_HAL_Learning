@@ -146,11 +146,14 @@ void digital_tube_display_string_IT(void){
 void play_string_it(int pos,const char *s){
     while(*s&&pos!=8){
         Tube_String8[pos][0]=*(s++);
-        if(*s=='.'){
-            Tube_String8[pos++][1]='.';
-            s++;
-        }else
-            Tube_String8[pos++][1]='\0';
+        if(*s) {
+            if (*s == '.') {
+                Tube_String8[pos++][1] = '.';
+                s++;
+            } else
+                Tube_String8[pos++][1] = '\0';
+        } else
+            break;
     }
 }
 /*在指定范围内显示整数*/
@@ -158,7 +161,7 @@ void play_num_it(int start,int end,int num){
     char fmt[]={'%',end+1-start+'0','d'};
     char n[9]={0};
     sprintf(n,fmt,num);
-    n[end+1]='\0';
+    n[end+1-start]='\0';
     play_string_it(start,n);
 }
 /*在指定空间内显示小数,可设置保留几位小数点*/
@@ -166,6 +169,6 @@ void play_float_it(int start,int end,float num,int len_after_point){
     char buffer[9];
     char fmt[]={'%',end+1-start+'0','.',len_after_point+'0','f'};
     sprintf(buffer, fmt, num);
-    buffer[end+1]='\0';
+    buffer[end+1-start]='\0';
     play_string_it(start,buffer);
 }
