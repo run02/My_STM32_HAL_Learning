@@ -9,7 +9,7 @@
 #define u8 uint8_t
 #define uc16 unsigned int
 #define PBeep(x) HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,(x))
-#define CPU_FREQUENCY_MHZ    6	// STM32时钟主频
+#define CPU_FREQUENCY_MHZ    8	// STM32时钟主频
 extern int buzz_play_flag;
 //             低7  1   2   3   4   5   6   7  高1 高2  高3 高4 高5 不发音
 const uc16 tone[] = {247,262,294,330,349,392,440,494,523,587,659,698,784,850,1000};//音频数据表

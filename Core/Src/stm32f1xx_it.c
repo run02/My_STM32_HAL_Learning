@@ -201,19 +201,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles RCC global interrupt.
-  */
-void RCC_IRQHandler(void)
-{
-  /* USER CODE BEGIN RCC_IRQn 0 */
-
-  /* USER CODE END RCC_IRQn 0 */
-  /* USER CODE BEGIN RCC_IRQn 1 */
-
-  /* USER CODE END RCC_IRQn 1 */
-}
-
-/**
   * @brief This function handles EXTI line0 interrupt.
   */
 void EXTI0_IRQHandler(void)
@@ -222,7 +209,7 @@ void EXTI0_IRQHandler(void)
 
 
   /* USER CODE END EXTI0_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  HAL_GPIO_EXTI_IRQHandler(K3_Pin);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
 
 
@@ -238,7 +225,7 @@ void EXTI1_IRQHandler(void)
   /* USER CODE BEGIN EXTI1_IRQn 0 */
 
   /* USER CODE END EXTI1_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+  HAL_GPIO_EXTI_IRQHandler(K2_Pin);
   /* USER CODE BEGIN EXTI1_IRQn 1 */
 //    led_display_bits(0xff);
 
@@ -255,7 +242,7 @@ void EXTI2_IRQHandler(void)
   /* USER CODE BEGIN EXTI2_IRQn 0 */
 
   /* USER CODE END EXTI2_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+  HAL_GPIO_EXTI_IRQHandler(K1_Pin);
   /* USER CODE BEGIN EXTI2_IRQn 1 */
 
   /* USER CODE END EXTI2_IRQn 1 */

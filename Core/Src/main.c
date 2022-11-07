@@ -43,6 +43,7 @@ static int cnt_press=0;
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim3;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -63,14 +64,14 @@ static void MX_TIM3_Init(void);
 #define K3 GPIO_PIN_0
 #define K2 GPIO_PIN_1
 #define K1 GPIO_PIN_2
-//缺陷是按键2没法消抖,有点难受
+//缺陷是按�?2没法消抖,有点难受
 void HAL_GPIO_EXTI_Callback(uint16_t key)
 {
     if(!HAL_GPIO_ReadPin(Key_GPIO_Group,key))
         return;
     if(key==K3){
         cnt_press=cnt_press>=1000?0:++cnt_press;
-        led_display_bits(0xf0);//因为硬件资源的冲突,LED灯会闪一下,而不是保持一直亮的状态
+        led_display_bits(0xf0);//因为硬件资源的冲�?,LED灯会闪一�?,而不是保持一直亮的状�?
         play_num_it(1,3,cnt_press);
     }else if(key==K2){
         static int i=2;
@@ -82,13 +83,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t key)
         cnt_press=cnt_press<0?999:--cnt_press;
         play_num_it(1,3,cnt_press);
     }
-//    HAL_Delay(20); //本来想延时消抖,但是会卡死,数码管直接黑屏,所以在上边用了扫描按键状态消抖.
+//    HAL_Delay(20); //本来想延时消�?,但是会卡�?,数码管直接黑�?,�?以在上边用了扫描按键状�?�消�?.
 /*
- 还有一种方法是在定时器里扫描,在定时器里边扫描,每次进来的时候会随着定时器中断进入的周期消抖.
+ 还有�?种方法是在定时器里扫�?,在定时器里边扫描,每次进来的时候会随着定时器中断进入的周期消抖.
  这种方法比较麻烦,但是稳定.
 */
 }
-/*定时器的回调函数,达到设定的时间就会调用这个函数,多个定时器共享这一个,通过传入的参数进行区分*/
+/*定时器的回调函数,达到设定的时间就会调用这个函�?,多个定时器共享这�?�?,通过传入的参数进行区�?*/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim3))
@@ -128,7 +129,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   buzz_init();
@@ -163,8 +163,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -175,8 +176,8 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
@@ -184,7 +185,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
 }
 
 /**
@@ -232,9 +232,6 @@ static void MX_TIM3_Init(void)
 
 }
 
-
-
-
 /**
   * @brief GPIO Initialization Function
   * @param None
@@ -245,54 +242,51 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
-                          |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, BUZZ_Pin|A_Pin|GPIO_PIN_9|GPIO_PIN_10
+                          |GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
+                          |H_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_LOCK_GPIO_Port, LED_LOCK_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PC0 PC1 PC2 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PE8 PE9 PE10 PE11
-                           PE12 PE13 PE14 PE15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
-                          |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+  /*Configure GPIO pins : BUZZ_Pin A_Pin PE9 PE10
+                           PE11 PE12 PE13 PE14
+                           H_Pin */
+  GPIO_InitStruct.Pin = BUZZ_Pin|A_Pin|GPIO_PIN_9|GPIO_PIN_10
+                          |GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
+                          |H_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  /*Configure GPIO pins : K3_Pin K2_Pin K1_Pin */
+  GPIO_InitStruct.Pin = K3_Pin|K2_Pin|K1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  /*Configure GPIO pin : LED_LOCK_Pin */
+  GPIO_InitStruct.Pin = LED_LOCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_LOCK_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 18, 0);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 19, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 12, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 20, 0);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 14, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
 }

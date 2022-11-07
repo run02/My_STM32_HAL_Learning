@@ -57,6 +57,23 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BUZZ_Pin GPIO_PIN_5
+#define BUZZ_GPIO_Port GPIOE
+#define K3_Pin GPIO_PIN_0
+#define K3_GPIO_Port GPIOC
+#define K3_EXTI_IRQn EXTI0_IRQn
+#define K2_Pin GPIO_PIN_1
+#define K2_GPIO_Port GPIOC
+#define K2_EXTI_IRQn EXTI1_IRQn
+#define K1_Pin GPIO_PIN_2
+#define K1_GPIO_Port GPIOC
+#define K1_EXTI_IRQn EXTI2_IRQn
+#define A_Pin GPIO_PIN_8
+#define A_GPIO_Port GPIOE
+#define H_Pin GPIO_PIN_15
+#define H_GPIO_Port GPIOE
+#define LED_LOCK_Pin GPIO_PIN_3
+#define LED_LOCK_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
