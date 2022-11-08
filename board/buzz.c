@@ -1,29 +1,55 @@
 //
 // Created by Ryan on 2022/10/12.
-//
-//#include "main.h"
-//#include "stm32f1xx_hal_rcc.h"
+
 #include "myAPI.h"
 #define u16 uint16_t
 #define u32 uint32_t
 #define u8 uint8_t
 #define uc16 unsigned int
-#define PBeep(x) HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,(x))
-#define CPU_FREQUENCY_MHZ    8	// STM32时钟主频
+
+#define PBeep(x) HAL_GPIO_WritePin(BUZZ_GROUP,BUZZ_PIN,(x))
+#define CPU_FREQUENCY_MHZ  8	// STM32时钟主频
 
 
 
 void buzz_init(void){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Pin = BUZZ_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+    HAL_GPIO_Init(BUZZ_GROUP, &GPIO_InitStruct);
 }
 
 
-
+void buzz(int value){
+    PBeep(value);
+}
+/*
+ * 这个函数要放到中断里,value小于threshold(阈值)会发出叫声
+ * f和duty如果是0就使用默认的参数
+ * 您也修改 #define BUZZ_FREQUENCY 与#define BUZZ_DUTY 来改变默认参数
+ * 因为是有源蜂鸣器,这个引脚上有没有PWM方波,
+ * 驱动有源蜂鸣器要用脉冲,只好用定时器模拟一个pwm了
+ * 缺点是蜂鸣器叫起来比较难听
+*/
+#define BUZZ_FREQUENCY 10
+#define BUZZ_DUTY 5
+void buzz_it(int value,int threshold,int f,int duty){
+    f=f==0?BUZZ_FREQUENCY:f;
+    duty=duty==0?BUZZ_DUTY:duty;
+    if (value>threshold){
+        static int i=0;
+        if(i<BUZZ_DUTY){
+            buzz(0);
+        }else{
+            buzz(1);
+        }
+        if(i++==BUZZ_FREQUENCY){
+            i=0;
+        }
+    }
+}
 
 
 
@@ -118,9 +144,5 @@ void play(void)
             }
         }
     }
-
 }
 
-void buzz(int value){
-    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,value);
-}
