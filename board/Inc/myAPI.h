@@ -1,12 +1,16 @@
 #ifndef _myAPI_h_
 #define _myAPI_h_
 #include "main.h"
-
+#include "boardLayout.h"
 //LED灯
 void led_init(void);
 void led_display_bits(uint32_t value);//LED位带操作
 void led_display_write_bit(int pos,int value);//设置指定LED灯的状态
 void test_led(void);//放在大循环中用于测试LED的两个函数
+#if !defined(IT_Freq)
+#define IT_Freq 1 //1ms 进入一次中断
+#endif
+void lsd_it(void);//在中断中流水灯,1s一次,需要提前知到几ms进一次中断
 
 //数码管
 void smg_init(void);   //数码管初始化
@@ -24,6 +28,7 @@ void play_float_it(int start,int end,float num,int len_after_point);/*在指定�
 void buzz_init(void);
 void buzz(int value);
 void play();//播放阴乐
+void buzz_it(int value,int threshold,int f,int duty);
 
 //adc转换
 float calculate_to_temperature(int ad);/*把12位温度模拟量转换位浮点数的温度*/
