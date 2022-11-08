@@ -53,7 +53,7 @@
 您可以通过以下命令下载此仓库:
 
 ```shell
-git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
+git clone https://github.com/LiRunJi/My_STM32_HAL_Learning.git
 ```
 
 进入文件夹后,使用以下命令来切换到具体对应的实验:
@@ -64,7 +64,7 @@ git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
 
 可以通过`Git`(非常推荐)下载示例工程,也可以通过压缩包下载每个分支的示例工程.
 
-![image-20221108154351032](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108154351032.png)
+![image-20221108173526418](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108173526418.png)
 
 经过[配置](###如何使用STM32CubeIDE运行示例工程 )后,可以轻松运行如下的各个分支:
 
@@ -72,7 +72,7 @@ git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
 
   ```shell
   git fetch
-  git checkout lab2-tubeDisplay
+  git checkout lab2-smg
   ```
 
 - 按键和电子音乐与数码管显示
@@ -705,8 +705,6 @@ void play(void)
 }
 ```
 
-
-
 ### 按键
 
 关于按键其实代码要写的并不多,只需要在`CubeMX`中配置,然后在对应的回调函数中写处理的逻辑即可.
@@ -807,16 +805,16 @@ int measure_the_temperature(void){
 
 ### 串口与DMA
 
-[串口与DMA实验](https://github.com/IHaveALotOfHair/my_hal_learning/tree/lab4-uartdma)
+[串口与DMA实验](https://github.com/LiRunJi/My_STM32_HAL_Learning/tree/lab4-uartdma)
 
 ### IIC读写EEPROM
 
-[EEPROM读写实验](https://github.com/IHaveALotOfHair/my_hal_learning/tree/lab5-eeprom)
+[EEPROM读写实验](https://github.com/LiRunJi/My_STM32_HAL_Learning/tree/lab5-eeprom)
 
 ### ADC
 
-[ADC读温度与报警实验](https://github.com/IHaveALotOfHair/my_hal_learning/tree/lab6-adcalarm)
+[ADC读温度与报警实验](https://github.com/LiRunJi/My_STM32_HAL_Learning/tree/lab6-adcalarm)
 
 ### RCC时钟配置
 
-[RCC时钟配置](https://github.com/IHaveALotOfHair/my_hal_learning/tree/rcc-config)
+[RCC时钟配置](https://github.com/LiRunJi/My_STM32_HAL_Learning/tree/rcc-config)
