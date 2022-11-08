@@ -21,11 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "string.h"
 #include "myAPI.h"
-#include "math.h"
-#define ADDR_EEPROM_Write 0xA0
-#define ADDR_EEPROM_Read 0xA1
+
+//#define ADDR_EEPROM_Write 0xA0
+//#define ADDR_EEPROM_Read 0xA1
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,13 +51,13 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
-//static int i=0;
+
 /* USER CODE BEGIN PV */
-uint8_t tx_buffer[]="This is transmit by DMA\n";
+//uint8_t tx_buffer[]="This is transmit by DMA\n";
 uint8_t rx_buffer[400]={0};
 int threshold=23;
-uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
-uint8_t i2c_rx_buffer[8];
+//uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
+//uint8_t i2c_rx_buffer[8];
 float temp;
 /* USER CODE END PV */
 
@@ -74,7 +73,7 @@ static void MX_ADC1_Init(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
     if(UartHandle == &huart1){
-        /*接收数据完成�????*/
+        /*接收数据完成*/
         if(HAL_UART_Receive_DMA(&huart1,rx_buffer,100)==HAL_OK){
             uint8_t s[]="have sent 100 words";
             HAL_UART_Transmit_DMA(&huart1,s,sizeof s);
@@ -87,8 +86,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == (&htim3))
     {
 
-        buzz_it(temp,threshold,0,0);
-        if(temp>threshold)
+        buzz_it((int)temp,threshold,0,0);
+        if((int)temp>threshold)
             lsd_it();
         else
             digital_tube_display_string_IT();
@@ -147,13 +146,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1)
     {
-
         temp=calculate_to_temperature(measure_the_temperature());
         play_float_it(0,3, temp,1);
         play_num_it(4,7, threshold);
-
         HAL_Delay(300);
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
