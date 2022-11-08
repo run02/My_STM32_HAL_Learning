@@ -50,13 +50,21 @@
 
 ### 六个实验与分支:
 
-您可以通过以下命令下载全部分支:
+您可以通过以下命令下载此仓库:
 
 ```shell
 git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
 ```
 
 进入文件夹后,使用以下命令来切换到具体对应的实验:
+
+也可以手动切换分支
+
+![image-20221108154207182](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108154207182.png)
+
+可以通过`Git`(非常推荐)下载示例工程,也可以通过压缩包下载每个分支的示例工程.
+
+![image-20221108154351032](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108154351032.png)
 
 经过[配置](###如何使用STM32CubeIDE运行示例工程 )后,可以轻松运行如下的各个分支:
 
