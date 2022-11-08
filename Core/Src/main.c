@@ -52,11 +52,11 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
-
+//static int i=0;
 /* USER CODE BEGIN PV */
 uint8_t tx_buffer[]="This is transmit by DMA\n";
 uint8_t rx_buffer[400]={0};
-int threshold=20;
+int threshold=23;
 uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
 uint8_t i2c_rx_buffer[8];
 float temp;
@@ -81,22 +81,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
         }
     }
 }
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim3))
     {
-        digital_tube_display_string_IT();
-        if (temp>threshold){
-            static int i=0;
-            if(i<5){
-                buzz(0);
-            }else{
-                buzz(1);
-            }
-            if(i++==10){
-                i=0;
-            }
-        }
+
+        buzz_it(temp,threshold,0,0);
+        if(temp>threshold)
+            lsd_it();
+        else
+            digital_tube_display_string_IT();
     }
 }
 
@@ -311,7 +306,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 10000;
+  htim3.Init.Period = 7999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
