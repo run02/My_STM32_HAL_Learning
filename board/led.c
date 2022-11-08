@@ -2,17 +2,7 @@
 // Created by Ryan on 2022/10/12.
 //
 #include "myAPI.h"
-#define L0 GPIO_PIN_8
-#define L1 GPIO_PIN_9
-#define L2 GPIO_PIN_10
-#define L3 GPIO_PIN_11
-#define L4 GPIO_PIN_12
-#define L5 GPIO_PIN_13
-#define L6 GPIO_PIN_14
-#define L7 GPIO_PIN_15
-#define ALL_LED L0|L1|L2|L3|L4|L5|L6|L7
-#define LED_GROUP GPIOE
-#define LED_SEL GPIO_PIN_3 //LED灯开关
+
 void led_init(void){
     smg_init();//数码管初始化就比LED初始化多了个引脚,懒得改了就用这个了.
 }
@@ -40,7 +30,14 @@ void led_display_write_bit(int pos,int value)//设置指定LED灯的状态
     unlock();
 }
 
-
+void lsd_it(void){
+    static int i=0,j=0;
+    if(++i>=(uint32_t)(0x500u/IT_Freq)){
+        j=j>=8?0:++j;
+        led_display_bits(0x01u<<j);
+        i=0;
+    }
+}
 /*测试LED灯的函数,里边有延时,只能放到while1里*/
 void test_led(void){
     static int cnt=0;
