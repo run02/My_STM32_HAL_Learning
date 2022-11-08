@@ -27,6 +27,8 @@ git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
 
 进入文件夹后,使用以下命令来切换到具体对应的实验:
 
+经过[配置](###如何使用STM32CubeIDE运行示例工程 )后,可以轻松运行如下的各个分支:
+
 - LED灯和数码管
 
   ```shell
@@ -96,9 +98,51 @@ git clone https://github.com/IHaveALotOfHair/my_hal_learning.git
 
 这个比较慢,先留个坑
 
-### STM32CubeIDE
+### 如何使用STM32CubeIDE运行示例工程
 
 CubeIDE是ST官方给出的开发环境, 对于装环境而言是最快速的, 基本上下载好了打开个工程就可以运行, 用起来和Eclipse差不多.
+
+1. 导入工程
+
+   ![image-20221108150443542](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108150443542.png)
+
+   ![image-20221108150609634](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108150609634.png)
+
+2. 向工程中添加文件
+
+   ![image-20221108150841910](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108150841910.png)
+
+   ![image-20221108150938020](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108150938020.png)
+
+   ![image-20221108151102894](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151102894.png)
+
+   ![image-20221108151133755](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151133755.png)
+
+   添加完成后会在这里出现:
+
+   ![image-20221108151244012](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151244012.png)
+
+   点击`ADD Floder`
+
+   ![image-20221108151342570](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151342570.png)
+
+   ![image-20221108151437008](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151437008.png)
+
+   ![image-20221108151500423](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151500423.png)
+
+3. 配置下载器配置为J-Link
+
+   ![image-20221108151635660](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151635660.png)
+
+   ![image-20221108151600881](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151600881.png)
+
+4. 配置完成,点击![image-20221108151707470](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151707470.png)下载到开发板并运行,点击![image-20221108151751928](https://my-blogs-imgs-1312546167.cos.ap-nanjing.myqcloud.com//image-20221108151751928.png)可以打断点调试.您也可以按照上述同样的方法添加自己的c源文件.
+
+   
+
+
+
+
 
 ### CLion+CubeMX+OpenOcd+Arm-None-Eabi+MinGW+J-Link
 
