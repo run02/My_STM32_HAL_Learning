@@ -1,8 +1,4 @@
 #include "myAPI.h"
-#define Key_GPIO_Group GPIOC
-#define K3 GPIO_PIN_0
-#define K2 GPIO_PIN_1
-#define K1 GPIO_PIN_2
 
 extern int threshold;//阈值
 /*
