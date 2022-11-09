@@ -23,8 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include "myAPI.h"
 
-//#define ADDR_EEPROM_Write 0xA0
-//#define ADDR_EEPROM_Read 0xA1
+#define ADDR_EEPROM_Write 0xA0
+#define ADDR_EEPROM_Read 0xA1
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,8 +56,8 @@ DMA_HandleTypeDef hdma_usart1_tx;
 //uint8_t tx_buffer[]="This is transmit by DMA\n";
 uint8_t rx_buffer[400]={0};
 int threshold=23;
-//uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
-//uint8_t i2c_rx_buffer[8];
+uint8_t i2c_tx_buffer[]={'h','e','l','l','o','\0'};
+uint8_t i2c_rx_buffer[8];
 float temp;
 /* USER CODE END PV */
 
@@ -141,6 +141,11 @@ int main(void)
     HAL_UART_Receive_IT(&huart1,rx_buffer,100);
     HAL_UART_Receive_DMA(&huart1,rx_buffer,100);
   /* USER CODE END 2 */
+    HAL_UART_Transmit(&huart1,"write iic: \n",sizeof "write iic: \n",0xff);
+    HAL_UART_Transmit(&huart1,i2c_tx_buffer,sizeof i2c_tx_buffer,0xff);
+    HAL_UART_Transmit(&huart1,"\n",sizeof "\n",0xff);
+    HAL_I2C_Mem_Write(&hi2c1,ADDR_EEPROM_Write,0,I2C_MEMADD_SIZE_8BIT,i2c_tx_buffer,sizeof i2c_tx_buffer,0xff);
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -150,7 +155,11 @@ int main(void)
         play_float_it(0,3, temp,1);
         play_num_it(4,7, threshold);
         HAL_Delay(300);
-    /* USER CODE END WHILE */
+        HAL_I2C_Mem_Read(&hi2c1,ADDR_EEPROM_Write,0,I2C_MEMADD_SIZE_8BIT,i2c_rx_buffer,sizeof i2c_tx_buffer,0xff);
+        HAL_UART_Transmit(&huart1,"read iic: \n",sizeof "read iic: \n",0xff);
+        HAL_UART_Transmit(&huart1,i2c_rx_buffer,sizeof i2c_tx_buffer,0xff);
+        /*
+     * USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     }
