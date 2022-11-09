@@ -145,7 +145,10 @@ int main(void)
     HAL_UART_Transmit(&huart1,i2c_tx_buffer,sizeof i2c_tx_buffer,0xff);
     HAL_UART_Transmit(&huart1,"\n",sizeof "\n",0xff);
     HAL_I2C_Mem_Write(&hi2c1,ADDR_EEPROM_Write,0,I2C_MEMADD_SIZE_8BIT,i2c_tx_buffer,sizeof i2c_tx_buffer,0xff);
-
+//    HAL_I2C_Master_Receive();
+//    HAL_I2C_Mem_Read();
+//    HAL_I2C_Mem_Write();
+//    HAL_I2C_Master_Transmit();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
