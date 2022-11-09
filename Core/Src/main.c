@@ -151,10 +151,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1)
     {
-        temp=calculate_to_temperature(measure_the_temperature());
-        play_float_it(0,3, temp,1);
-        play_num_it(4,7, threshold);
-        HAL_Delay(300);
+        HAL_Delay(2000);
         HAL_I2C_Mem_Read(&hi2c1,ADDR_EEPROM_Write,0,I2C_MEMADD_SIZE_8BIT,i2c_rx_buffer,sizeof i2c_tx_buffer,0xff);
         HAL_UART_Transmit(&huart1,"read iic: \n",sizeof "read iic: \n",0xff);
         HAL_UART_Transmit(&huart1,i2c_rx_buffer,sizeof i2c_tx_buffer,0xff);
